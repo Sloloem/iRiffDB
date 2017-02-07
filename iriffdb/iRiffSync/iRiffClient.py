@@ -63,12 +63,13 @@ class iRiffClient:
           if length > presentIndex:
             return guessedName[length:len(rawName)]
 
+      dashIndex = guessedName.find("-")
+      if dashIndex != -1:
+        return guessedName[dashIndex+1:len(guessedName)].strip()
+
       colonIndex = guessedName.find(":")
       if colonIndex != -1:
         guessedName = guessedName[colonIndex+1:len(guessedName)]
-      dashIndex = guessedName.find("-")
-      if dashIndex != -1:
-        guessedName = guessedName[dashIndex+1:len(guessedName)]
       return guessedName.strip()
 
     def fillExtraData(self, item):
