@@ -25,8 +25,51 @@ class iRiffClient:
             currentItem.url = labelEl.get("href")
             currentItem.rawName = labelEl.text
             self.fillExtraData(currentItem)
+            currentItem.guessedTitle = self.guessMovieTitle(currentItem.rawName)
             print(currentItem)
             self.pageItems.append(currentItem)
+
+    def removeSurrounding(self, orig, remove):
+      if orig.lower().startswith(remove):
+        orig = orig[len(remove):len(orig)]
+      if orig.lower().endswith(remove):
+        orig = orig[len(orig)-len(remove)]
+      return orig.strip()
+
+    def guessMovieTitle(self, rawName):
+      #If Present or Presents is here, the title is probably whatever comes after
+      #Any words ending in Trax are probably not titles.
+      #Phrases after a colon are probably titles, unless they're sequel subtitles.
+      guessedName = ""
+      for part in rawName.split(" "):
+        if not ("riff" in part.lower() or part.lower().endswith("trax")):
+          guessedName += part+" "
+        elif part.endswith(":"):
+          guessedName += ": "
+      guessedName = guessedName.strip()
+      guessedName = self.removeSurrounding(guessedName, "by")
+      guessedName = self.removeSurrounding(guessedName, ":")
+      guessedName = self.removeSurrounding(guessedName, "-")
+      
+      presentIndex = guessedName.lower().find("presents")
+      if presentIndex == -1:
+        presentIndex = guessedName.lower().find("present")
+      if presentIndex != -1:
+        nameParts = guessedName.split(" ")
+        length = 0
+        endOfPresent = 0
+        for part in nameParts:
+          length += len(part)
+          if length > presentIndex:
+            return guessedName[length:len(rawName)]
+
+      colonIndex = guessedName.find(":")
+      if colonIndex != -1:
+        guessedName = guessedName[colonIndex+1:len(guessedName)]
+      dashIndex = guessedName.find("-")
+      if dashIndex != -1:
+        guessedName = guessedName[dashIndex+1:len(guessedName)]
+      return guessedName.strip()
 
     def fillExtraData(self, item):
         document = self.getElementForSection(iRiffClient.Host+item.url)
@@ -52,6 +95,7 @@ class iRiffItem:
     """Represents an iRiff Item"""
     def __init__(self):
         self.rawName = ""
+        self.guessedTitle = ""
         self.url = ""
         self.imageRef = ""
         self.price = ""
