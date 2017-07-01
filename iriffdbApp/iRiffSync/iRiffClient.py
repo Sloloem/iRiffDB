@@ -3,7 +3,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import ParseError
 
-from iriffdb.models import iRiffItem
+from iRiffSync.models import iRiffItem
 
 class iRiffClient:
     """Interface to the iRiff listing"""
@@ -94,6 +94,3 @@ class iRiffClient:
         except ParseError:
             return ET.fromstring(documentHtml+b'</div></div></div></div></div></div></section>')
 
-if __name__ == '__main__':
-    client = iRiffClient()
-    client.getPage(0)
