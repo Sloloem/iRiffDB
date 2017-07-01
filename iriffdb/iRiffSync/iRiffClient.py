@@ -3,6 +3,8 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import ParseError
 
+from iriffdb.models import iRiffItem
+
 class iRiffClient:
     """Interface to the iRiff listing"""
     baseSearchURL = "/iriffs?solrsort=ds_field_date_released%20desc"
@@ -38,7 +40,7 @@ class iRiffClient:
 
     def guessMovieTitle(self, rawName):
       #If Present or Presents is here, the title is probably whatever comes after
-      #Any words ending in Trax are probably not titles.
+      #Any words ending in Trax are probably not titles, though this will probably lose me Terror T.R.A.X depending on how they spell it.
       #Phrases after a colon are probably titles, unless they're sequel subtitles.
       guessedName = ""
       for part in rawName.split(" "):
@@ -91,23 +93,6 @@ class iRiffClient:
             return ET.fromstring(documentHtml)
         except ParseError:
             return ET.fromstring(documentHtml+b'</div></div></div></div></div></div></section>')
-
-class iRiffItem:
-    """Represents an iRiff Item"""
-    def __init__(self):
-        self.rawName = ""
-        self.guessedTitle = ""
-        self.url = ""
-        self.imageRef = ""
-        self.price = ""
-        self.description = ""
-
-    def __str__(self):
-        asString = "iRiffItem\n"
-        variables = vars(self)
-        for member in variables:
-            asString += member+"="+variables[member]+'\n'
-        return str(asString.encode(sys.getdefaultencoding(), 'replace'))
 
 if __name__ == '__main__':
     client = iRiffClient()
