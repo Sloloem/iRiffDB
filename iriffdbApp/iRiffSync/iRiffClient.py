@@ -10,10 +10,8 @@ class iRiffClient:
     baseSearchURL = "/iriffs?solrsort=ds_field_date_released%20desc"
     Host = "http://www.rifftrax.com"
 
-    def __init__(self):
-        self.pageItems = []
-        
     def getPage(self, pageNo):
+        pageItems = []
         document = self.getElementForSection(iRiffClient.Host+iRiffClient.baseSearchURL+"&page="+str(pageNo))
         iRiffsOnPage = list(document.find(".//div[@class='view-content']"))
         for iRiffOnPage in iRiffsOnPage:
@@ -28,8 +26,8 @@ class iRiffClient:
             currentItem.rawName = labelEl.text
             self.fillExtraData(currentItem)
             currentItem.guessedTitle = self.guessMovieTitle(currentItem.rawName)
-            print(currentItem)
-            self.pageItems.append(currentItem)
+            pageItems.append(currentItem)
+        return pageItems
 
     def removeSurrounding(self, orig, remove):
       if orig.lower().startswith(remove):
