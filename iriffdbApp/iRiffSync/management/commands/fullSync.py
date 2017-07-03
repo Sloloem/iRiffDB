@@ -12,6 +12,7 @@ class Command(BaseCommand):
       self.stdout.write("On Page {} found {} items".format(page, len(pageItems)))
       if (len(pageItems) == 0):
         break
+      self.savePage(pageItems)
       page += 1
       
   @transaction.atomic

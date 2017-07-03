@@ -1,7 +1,8 @@
 import sys
 import urllib.request
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import ParseError
+from lxml import etree as ET
+from lxml.html.soupparser import fromstring
+from lxml.etree import tostring
 
 from iRiffSync.models import iRiffItem
 
@@ -11,9 +12,12 @@ class iRiffClient:
     Host = "http://www.rifftrax.com"
 
     def getPage(self, pageNo):
+        #print("Starting to fetch iRiff Page {}.".format(pageNo))
         pageItems = []
         document = self.getElementForSection(iRiffClient.Host+iRiffClient.baseSearchURL+"&page="+str(pageNo))
-        iRiffsOnPage = list(document.find(".//div[@class='view-content']"))
+
+        iRiffsOnPage = list(document.find(".//div[@class='view-content']") or [])
+        print("Found {} iRiff Stubs on this page.".format(len(iRiffsOnPage)))
         for iRiffOnPage in iRiffsOnPage:
             currentItem = iRiffItem()
             #First the poster
@@ -22,8 +26,9 @@ class iRiffClient:
                 currentItem.imageRef = posterImg.get("src")
             #Then the URL and raw name
             labelEl = iRiffOnPage.find("./div[last()]//a")
-            currentItem.url = labelEl.get("href")
+            currentItem.url = urllib.request.pathname2url(labelEl.get("href"))
             currentItem.rawName = labelEl.text
+            #print("Found iRiff ({}) and fetching extra data".format(currentItem.rawName))
             self.fillExtraData(currentItem)
             currentItem.guessedTitle = self.guessMovieTitle(currentItem.rawName)
             pageItems.append(currentItem)
@@ -70,6 +75,7 @@ class iRiffClient:
       colonIndex = guessedName.find(":")
       if colonIndex != -1:
         guessedName = guessedName[colonIndex+1:len(guessedName)]
+      #print("From original title ({}) and guessed movie title is: {}".format(rawName, guessedName.strip()))
       return guessedName.strip()
 
     def fillExtraData(self, item):
@@ -78,17 +84,24 @@ class iRiffClient:
         for field in fields:
             fieldClass = field.get("class")
             if "pane-node-product-commerce-price" in fieldClass:
-                item.price = ''.join(field.itertext()).strip()
+                item.price = ''.join(field.itertext()).strip().strip('$')
             elif "pane-node-body" in fieldClass:
                 item.description = ''.join(field.itertext()).strip()
+        if item.price is None:
+          print("Found an item with NULL price, assuming $1.99")
+          print(iRiffClient.Host+item.url)
+          item.price = 1.99
 
     def getElementForSection(self, url):
-        documentHtml = urllib.request.urlopen(url).read()
-        bodyStart = documentHtml.find(b"<section id=\"main-content\">")
-        bodyEnd = documentHtml.find(b"</section>",bodyStart)+10
-        documentHtml = documentHtml[bodyStart:bodyEnd]
-        try:
-            return ET.fromstring(documentHtml)
-        except ParseError:
-            return ET.fromstring(documentHtml+b'</div></div></div></div></div></div></section>')
+      #print("Grabbing from URL ({}) and trying to find main-content.".format(url))
+      documentHtml = urllib.request.urlopen(url).read()
+      document = fromstring(documentHtml);
+      return document.find(".//section[@id='main-content']")
+#      bodyStart = documentHtml.find(b"<section id=\"main-content\">")
+#      bodyEnd = documentHtml.find(b"</section>",bodyStart)+10
+#      documentHtml = documentHtml[bodyStart:bodyEnd]
+#      try:
+#      return ET.fromstring(documentHtml)
+#      except ParseError:
+#      return ET.fromstring(documentHtml+b'</div></div></div></div></div></div></section>')
 
