@@ -12,7 +12,7 @@ class iRiffClient:
     Host = "http://www.rifftrax.com"
 
     def getPage(self, pageNo):
-        #print("Starting to fetch iRiff Page {}.".format(pageNo))
+        print("Starting to fetch iRiff Page {}: {}.".format(pageNo,iRiffClient.Host+iRiffClient.baseSearchURL+"&page="+str(pageNo)))
         pageItems = []
         document = self.getElementForSection(iRiffClient.Host+iRiffClient.baseSearchURL+"&page="+str(pageNo))
 
@@ -92,8 +92,8 @@ class iRiffClient:
           print(iRiffClient.Host+item.url)
           item.price = 1.99
         if item.imageRef == '':
-          print("No image ref on list page, using image from item page if available")
-          print(iRiffClient.Host+item.url)
+          #print("No image ref on list page, using image from item page if available")
+          #print(iRiffClient.Host+item.url)
           image = document.find(".//img[@class='image-style-poster-medium']")
           if image is not None:
             item.imageRef=image.get('src')
