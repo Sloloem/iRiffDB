@@ -91,17 +91,16 @@ class iRiffClient:
           print("Found an item with NULL price, assuming $1.99")
           print(iRiffClient.Host+item.url)
           item.price = 1.99
+        if item.imageRef == '':
+          print("No image ref on list page, using image from item page if available")
+          print(iRiffClient.Host+item.url)
+          image = document.find(".//img[@class='image-style-poster-medium']")
+          if image is not None:
+            item.imageRef=image.get('src')
 
     def getElementForSection(self, url):
       #print("Grabbing from URL ({}) and trying to find main-content.".format(url))
       documentHtml = urllib.request.urlopen(url).read()
       document = fromstring(documentHtml);
       return document.find(".//section[@id='main-content']")
-#      bodyStart = documentHtml.find(b"<section id=\"main-content\">")
-#      bodyEnd = documentHtml.find(b"</section>",bodyStart)+10
-#      documentHtml = documentHtml[bodyStart:bodyEnd]
-#      try:
-#      return ET.fromstring(documentHtml)
-#      except ParseError:
-#      return ET.fromstring(documentHtml+b'</div></div></div></div></div></div></section>')
 

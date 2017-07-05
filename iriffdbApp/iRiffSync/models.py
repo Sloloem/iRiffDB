@@ -5,7 +5,7 @@ class iRiffItem(models.Model):
     """Represents an iRiff Item"""
     rawName = models.CharField(max_length=400)
     guessedTitle = models.CharField(max_length=400)
-    correctedTitle = models.CharField(max_length=400)
+    correctedTitle = models.BooleanField(default=False)
     url = models.URLField()
     imageRef = models.URLField()
     price = models.DecimalField(decimal_places=2,max_digits=5)

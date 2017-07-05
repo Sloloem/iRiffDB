@@ -1,0 +1,32 @@
+<html>
+  <body>
+    <form action="/search">
+      <label for="q">Search for:</label>
+      <input name="q" type="text">
+      <input value="Search" type="submit">
+    </form>
+    <hr />
+    <table style="margin:0px auto">
+      <thead>
+        <tr>
+          <th>Poster</th>
+          <th>Title</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results %}
+          <tr>
+            <td><a href="{{ riffHost }}{{ item.url }}">
+              <img src="{{ item.imageRef }}" /><br />
+              {{ item.guessedTitle }}
+            </a>
+            </td>
+            <td>{{ item.guessedTitle }}</td>
+            <td>{{ item.price }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
