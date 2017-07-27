@@ -2,7 +2,11 @@
   <body>
     <form action="/search">
       <label for="q">Search for:</label>
-      <input name="q" type="text">
+      <input name="q" type="text" value="{{ term }}">
+      <label for="includeDesc">Include Description?</label>
+      <input id="includeDesc" name="includeDesc" type="checkbox" {% if includeDesc %}checked{% endif %}/>
+      <label for="includeRawTitle">Include Raw Title?</label>
+      <input id="includeRawTitle" name="includeRawTitle" type="checkbox" {% if includeRaw %}checked{% endif %}/>
       <input value="Search" type="submit">
     </form>
     <hr />
