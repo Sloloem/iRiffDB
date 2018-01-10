@@ -3,3 +3,6 @@
 .pydevproject
 .settings/
 venv/
+
+iriffdbApp/db.sqlite3
+iriffdbApp/iRiffSync/migrations/*
