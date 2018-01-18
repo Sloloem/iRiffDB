@@ -100,7 +100,8 @@ class iRiffClient:
 
     def getElementForSection(self, url):
       #print("Grabbing from URL ({}) and trying to find main-content.".format(url))
-      documentHtml = urllib.request.urlopen(url).read()
+      documentResponse = urllib.request.urlopen(url)
+      documentHtml = documentResponse.read()
       document = fromstring(documentHtml);
-      return document.find(".//section[@id='main-content']")
+      return document.find(".//*[@id='main-content']").getparent()
 
