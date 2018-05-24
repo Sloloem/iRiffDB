@@ -18,4 +18,5 @@ class Command(BaseCommand):
   @transaction.atomic
   def savePage(self, items):
     for item in items:
+      #TODO: Grab the existing item from the DB and update in case it's needed
       item.save() 
